@@ -7,17 +7,20 @@ const welcome = { title: "React", greeting: "Hey" };
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
 
-interface Story {
+interface StoryProps {
   title: string;
   url: string;
   author: string;
   num_comments: number;
   points: number;
-  objectId: number;
 }
 
-const Item: React.FC<{ item: Story }> = ({
-  item: { url, title, author, num_comments, points },
+const Item: React.FC<StoryProps> = ({
+  url,
+  title,
+  author,
+  num_comments,
+  points,
 }) => (
   <li style={{ textAlign: "left" }}>
     <span>
@@ -39,12 +42,14 @@ const Item: React.FC<{ item: Story }> = ({
   </li>
 );
 
-const List: React.FC<{ list: Array<Story> }> = ({ list }) => {
+type ListItem = StoryProps & { objectId: number };
+
+const List: React.FC<{ list: Array<ListItem> }> = ({ list }) => {
   console.log("rendering List");
   return (
     <ul style={{ marginBottom: "20px" }}>
-      {list.map((item) => (
-        <Item key={item.objectId} item={item} />
+      {list.map(({ objectId, ...item }) => (
+        <Item key={objectId} {...item} />
       ))}
     </ul>
   );
