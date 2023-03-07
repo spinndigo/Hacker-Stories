@@ -16,22 +16,24 @@ interface Story {
   objectId: number;
 }
 
-const Item: React.FC<{ item: Story }> = ({ item }) => (
+const Item: React.FC<{ item: Story }> = ({
+  item: { url, title, author, num_comments, points },
+}) => (
   <li style={{ textAlign: "left" }}>
     <span>
       {" "}
-      <a href={item.url}>{item.title} </a> {" - "}
+      <a href={url}>{title} </a> {" - "}
     </span>
     <span>
-      author: {item.author}
+      author: {author}
       {" - "}
     </span>
     <span>
-      comments: {item.num_comments}
+      comments: {num_comments}
       {" - "}
     </span>
     <span>
-      points: {item.points}
+      points: {points}
       {" - "}
     </span>
   </li>
