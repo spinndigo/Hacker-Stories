@@ -20,7 +20,7 @@ const Item: React.FC<{ item: Story }> = ({ item }) => (
   <li style={{ textAlign: "left" }}>
     <span>
       {" "}
-      <a href={item.url}>{item.title} </a>{" "}
+      <a href={item.url}>{item.title} </a> {" - "}
     </span>
     <span>
       author: {item.author}
@@ -50,11 +50,11 @@ const List: React.FC<{ list: Array<Story> }> = ({ list }) => {
 
 interface SearchProps {
   handleSearch(event: InputEvent): void;
+  searchTerm: string;
 }
 
-const Search: React.FC<SearchProps> = ({ handleSearch }) => {
+const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
   console.log("rendering Search");
-  const [searchTerm, setSearchTerm] = useState("");
 
   const handleChange = (event: InputEvent) => {
     handleSearch(event);
@@ -75,6 +75,7 @@ const Search: React.FC<SearchProps> = ({ handleSearch }) => {
 
 const App: React.FC<{}> = () => {
   console.log("rendering App");
+  const [searchTerm, setSearchTerm] = useState("");
   const stories = [
     {
       title: "React",
@@ -94,8 +95,12 @@ const App: React.FC<{}> = () => {
     },
   ];
 
+  const filteredStories = stories.filter((item) =>
+    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
+    setSearchTerm(event.target.value);
   };
 
   return (
@@ -104,9 +109,9 @@ const App: React.FC<{}> = () => {
         {" "}
         {welcome.greeting} {welcome.title}
       </h1>
-      <Search handleSearch={handleSearch} />
+      <Search searchTerm={searchTerm} handleSearch={handleSearch} />
       <hr />
-      <List list={stories} />
+      <List list={filteredStories} />
     </div>
   );
 };
