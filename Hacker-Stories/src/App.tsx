@@ -63,7 +63,12 @@ const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
   return (
     <div>
       <label htmlFor="search">{"Search: "}</label>
-      <input id="search" type="text" onChange={handleChange} />
+      <input
+        value={searchTerm}
+        id="search"
+        type="text"
+        onChange={handleChange}
+      />
 
       <p>
         {" "}
@@ -75,7 +80,7 @@ const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
 
 const App: React.FC<{}> = () => {
   console.log("rendering App");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("React");
   const stories = [
     {
       title: "React",
