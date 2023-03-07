@@ -1,9 +1,11 @@
-import { SyntheticEvent } from "react";
+import { SyntheticEvent, useState } from "react";
 import "./App.css";
 
 const title = "React";
 
 const welcome = { title: "React", greeting: "Hey" };
+
+type InputEvent = React.ChangeEvent<HTMLInputElement>;
 
 interface Story {
   title: string;
@@ -15,7 +17,7 @@ interface Story {
 }
 
 const Item: React.FC<{ item: Story }> = ({ item }) => (
-  <li style={{ textAlign: "left" }} key={item.objectId}>
+  <li style={{ textAlign: "left" }}>
     <span>
       {" "}
       <a href={item.url}>{item.title} </a>{" "}
@@ -36,30 +38,43 @@ const Item: React.FC<{ item: Story }> = ({ item }) => (
 );
 
 const List: React.FC<{ list: Array<Story> }> = ({ list }) => {
+  console.log("rendering List");
   return (
     <ul style={{ marginBottom: "20px" }}>
       {list.map((item) => (
-        <Item item={item} />
+        <Item key={item.objectId} item={item} />
       ))}
     </ul>
   );
 };
 
-const Search: React.FC<{}> = () => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event);
-    console.log(event.target.value);
+interface SearchProps {
+  handleSearch(event: InputEvent): void;
+}
+
+const Search: React.FC<SearchProps> = ({ handleSearch }) => {
+  console.log("rendering Search");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleChange = (event: InputEvent) => {
+    handleSearch(event);
   };
 
   return (
-    <>
+    <div>
       <label htmlFor="search">{"Search: "}</label>
       <input id="search" type="text" onChange={handleChange} />
-    </>
+
+      <p>
+        {" "}
+        Searching for <strong>{searchTerm}</strong>{" "}
+      </p>
+    </div>
   );
 };
 
 const App: React.FC<{}> = () => {
+  console.log("rendering App");
   const stories = [
     {
       title: "React",
@@ -79,13 +94,17 @@ const App: React.FC<{}> = () => {
     },
   ];
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value);
+  };
+
   return (
     <div>
       <h1>
         {" "}
         {welcome.greeting} {welcome.title}
       </h1>
-      <Search />
+      <Search handleSearch={handleSearch} />
       <hr />
       <List list={stories} />
     </div>
