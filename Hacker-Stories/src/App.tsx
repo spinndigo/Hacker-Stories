@@ -1,9 +1,28 @@
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import "./App.css";
 
 const title = "React";
 
 const welcome = { title: "React", greeting: "Hey" };
+
+const stories = [
+  {
+    title: "React",
+    url: "https://reactjs.org/",
+    author: "Jordan Walke",
+    num_comments: 3,
+    points: 4,
+    objectId: 0,
+  },
+  {
+    title: "Redux",
+    url: "https://redux.js.org/",
+    author: "Dan Abramov, Andrew Clark",
+    num_comments: 2,
+    points: 5,
+    objectId: 1,
+  },
+];
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
 
@@ -87,25 +106,13 @@ const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
 
 const App: React.FC<{}> = () => {
   console.log("rendering App");
-  const [searchTerm, setSearchTerm] = useState("React");
-  const stories = [
-    {
-      title: "React",
-      url: "https://reactjs.org/",
-      author: "Jordan Walke",
-      num_comments: 3,
-      points: 4,
-      objectId: 0,
-    },
-    {
-      title: "Redux",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectId: 1,
-    },
-  ];
+  const [searchTerm, setSearchTerm] = useState(
+    localStorage.getItem("search") || "react"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("search", searchTerm);
+  }, [searchTerm]);
 
   const filteredStories = stories.filter((item) =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
