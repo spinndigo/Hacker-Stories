@@ -1,17 +1,20 @@
-import {
-  PropsWithChildren,
-  SyntheticEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const title = "React";
 
 const welcome = { title: "React", greeting: "Hey" };
 
-const stories = [
+interface Story {
+  title: string;
+  url: string;
+  author: string;
+  num_comments: number;
+  points: number;
+  objectId: number;
+}
+
+const stories: Array<Story> = [
   {
     title: "React",
     url: "https://reactjs.org/",
@@ -32,7 +35,7 @@ const stories = [
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
 
-interface StoryProps {
+interface ItemProps {
   title: string;
   url: string;
   author: string;
@@ -40,12 +43,13 @@ interface StoryProps {
   points: number;
 }
 
-const Item: React.FC<StoryProps> = ({
+const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
   url,
   title,
   author,
   num_comments,
   points,
+  handleRemove,
 }) => (
   <li style={{ textAlign: "left" }}>
     <span>
@@ -64,17 +68,34 @@ const Item: React.FC<StoryProps> = ({
       points: {points}
       {" - "}
     </span>
+    <button onClick={handleRemove}>{"Remove"}</button>
   </li>
 );
 
-type ListItem = StoryProps & { objectId: number };
+type ListItem = ItemProps & { objectId: number };
+interface ListProps {
+  list: Array<ListItem>;
+  setList: React.Dispatch<React.SetStateAction<Story[]>>;
+}
 
-const List: React.FC<{ list: Array<ListItem> }> = ({ list }) => {
+const List: React.FC<ListProps> = ({ list, setList }) => {
   console.log("rendering List");
+
+  const handleRemove = (id: number) => {
+    setList((prev) => {
+      const updatedList = prev.filter((story) => !(story.objectId === id));
+      return updatedList;
+    });
+  };
+
   return (
     <ul style={{ marginBottom: "20px" }}>
       {list.map(({ objectId, ...item }) => (
-        <Item key={objectId} {...item} />
+        <Item
+          key={objectId}
+          handleRemove={() => handleRemove(objectId)}
+          {...item}
+        />
       ))}
     </ul>
   );
@@ -142,8 +163,9 @@ const useStorageState = (key: string, initialState: string) => {
 const App: React.FC<{}> = () => {
   console.log("rendering App");
   const { value, setValue } = useStorageState("search", "React");
+  const [list, setList] = useState(stories);
 
-  const filteredStories = stories.filter((item) =>
+  const filteredStories = list.filter((item) =>
     item.title.toLowerCase().includes(value.toLowerCase())
   );
 
@@ -166,7 +188,7 @@ const App: React.FC<{}> = () => {
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
       <hr />
-      <List list={filteredStories} />
+      <List setList={setList} list={filteredStories} />
     </>
   );
 };
