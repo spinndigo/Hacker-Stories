@@ -74,31 +74,35 @@ const List: React.FC<{ list: Array<ListItem> }> = ({ list }) => {
   );
 };
 
-interface SearchProps {
-  handleSearch(event: InputEvent): void;
-  searchTerm: string;
+interface InputWithLabelProps {
+  onInputChange(event: InputEvent): void;
+  value: string;
+  id: string;
+  label: string;
+  type?: string;
 }
 
-const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
-  console.log("rendering Search");
+const InputWithLabel: React.FC<InputWithLabelProps> = ({
+  onInputChange,
+  value,
+  id,
+  label,
+  type = "text",
+}) => {
+  console.log("rendering InputWithLabel");
 
   const handleChange = (event: InputEvent) => {
-    handleSearch(event);
+    onInputChange(event);
   };
 
   return (
     <>
-      <label htmlFor="search">{"Search: "}</label>
-      <input
-        value={searchTerm}
-        id="search"
-        type="text"
-        onChange={handleChange}
-      />
+      <label htmlFor={id}>{label}: </label>
+      <input value={value} id={id} type={type} onChange={handleChange} />
 
       <p>
         {" "}
-        Searching for <strong>{searchTerm}</strong>{" "}
+        Searching for <strong>{value}</strong>{" "}
       </p>
     </>
   );
@@ -132,7 +136,12 @@ const App: React.FC<{}> = () => {
         {" "}
         {welcome.greeting} {welcome.title}
       </h1>
-      <Search searchTerm={value} handleSearch={handleSearch} />
+      <InputWithLabel
+        value={value}
+        onInputChange={handleSearch}
+        id={"search"}
+        label={"Search Term"}
+      />
       <hr />
       <List list={filteredStories} />
     </>
