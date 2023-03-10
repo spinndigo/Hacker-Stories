@@ -104,22 +104,26 @@ const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
   );
 };
 
-const App: React.FC<{}> = () => {
-  console.log("rendering App");
-  const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem("search") || "react"
-  );
+const useStorageState = (key: string, initialState: string) => {
+  const [value, setValue] = useState(localStorage.getItem(key) || initialState);
 
   useEffect(() => {
-    localStorage.setItem("search", searchTerm);
-  }, [searchTerm]);
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return { value, setValue };
+};
+
+const App: React.FC<{}> = () => {
+  console.log("rendering App");
+  const { value, setValue } = useStorageState("search", "React");
 
   const filteredStories = stories.filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    item.title.toLowerCase().includes(value.toLowerCase())
   );
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    setValue(event.target.value);
   };
 
   return (
@@ -128,7 +132,7 @@ const App: React.FC<{}> = () => {
         {" "}
         {welcome.greeting} {welcome.title}
       </h1>
-      <Search searchTerm={searchTerm} handleSearch={handleSearch} />
+      <Search searchTerm={value} handleSearch={handleSearch} />
       <hr />
       <List list={filteredStories} />
     </div>
