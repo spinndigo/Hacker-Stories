@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect, useState } from "react";
+import { PropsWithChildren, SyntheticEvent, useEffect, useState } from "react";
 import "./App.css";
 
 const title = "React";
@@ -78,16 +78,15 @@ interface InputWithLabelProps {
   onInputChange(event: InputEvent): void;
   value: string;
   id: string;
-  label: string;
   type?: string;
 }
 
-const InputWithLabel: React.FC<InputWithLabelProps> = ({
+const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
   onInputChange,
   value,
   id,
-  label,
   type = "text",
+  children,
 }) => {
   console.log("rendering InputWithLabel");
 
@@ -97,7 +96,7 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
 
   return (
     <>
-      <label htmlFor={id}>{label}: </label>
+      <label htmlFor={id}>{children}: </label>
       <input value={value} id={id} type={type} onChange={handleChange} />
 
       <p>
@@ -136,12 +135,9 @@ const App: React.FC<{}> = () => {
         {" "}
         {welcome.greeting} {welcome.title}
       </h1>
-      <InputWithLabel
-        value={value}
-        onInputChange={handleSearch}
-        id={"search"}
-        label={"Search Term"}
-      />
+      <InputWithLabel value={value} onInputChange={handleSearch} id={"search"}>
+        <strong> {"Search Term"} </strong>
+      </InputWithLabel>
       <hr />
       <List list={filteredStories} />
     </>
