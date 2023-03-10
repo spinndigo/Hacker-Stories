@@ -1,4 +1,10 @@
-import { PropsWithChildren, SyntheticEvent, useEffect, useState } from "react";
+import {
+  PropsWithChildren,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import "./App.css";
 
 const title = "React";
@@ -79,6 +85,7 @@ interface InputWithLabelProps {
   value: string;
   id: string;
   type?: string;
+  isFocused?: boolean;
 }
 
 const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
@@ -86,9 +93,18 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
   value,
   id,
   type = "text",
+  isFocused = false,
   children,
 }) => {
   console.log("rendering InputWithLabel");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isFocused]);
 
   const handleChange = (event: InputEvent) => {
     onInputChange(event);
@@ -97,7 +113,13 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
   return (
     <>
       <label htmlFor={id}>{children}: </label>
-      <input value={value} id={id} type={type} onChange={handleChange} />
+      <input
+        ref={inputRef}
+        value={value}
+        id={id}
+        type={type}
+        onChange={handleChange}
+      />
 
       <p>
         {" "}
@@ -135,7 +157,12 @@ const App: React.FC<{}> = () => {
         {" "}
         {welcome.greeting} {welcome.title}
       </h1>
-      <InputWithLabel value={value} onInputChange={handleSearch} id={"search"}>
+      <InputWithLabel
+        isFocused
+        value={value}
+        onInputChange={handleSearch}
+        id={"search"}
+      >
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
       <hr />
