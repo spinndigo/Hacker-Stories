@@ -87,7 +87,7 @@ const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
   };
 
   return (
-    <div>
+    <>
       <label htmlFor="search">{"Search: "}</label>
       <input
         value={searchTerm}
@@ -100,7 +100,7 @@ const Search: React.FC<SearchProps> = ({ handleSearch, searchTerm }) => {
         {" "}
         Searching for <strong>{searchTerm}</strong>{" "}
       </p>
-    </div>
+    </>
   );
 };
 
@@ -127,7 +127,7 @@ const App: React.FC<{}> = () => {
   };
 
   return (
-    <div>
+    <>
       <h1>
         {" "}
         {welcome.greeting} {welcome.title}
@@ -135,7 +135,7 @@ const App: React.FC<{}> = () => {
       <Search searchTerm={value} handleSearch={handleSearch} />
       <hr />
       <List list={filteredStories} />
-    </div>
+    </>
   );
 };
 
