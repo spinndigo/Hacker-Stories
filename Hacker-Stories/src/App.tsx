@@ -169,11 +169,17 @@ const App: React.FC<{}> = () => {
   console.log("rendering App");
   const { value, setValue } = useStorageState("search", "React");
   const [list, setList] = useState<Array<Story>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    getAsyncStories().then((result) => {
-      setList(result.data.stories);
-    });
+    setIsLoading(true);
+    getAsyncStories()
+      .then((result) => {
+        setList(result.data.stories);
+        setIsLoading(false);
+      })
+      .catch(() => setHasError(true));
   }, []);
 
   const filteredStories = list.filter((item) =>
@@ -199,7 +205,12 @@ const App: React.FC<{}> = () => {
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
       <hr />
-      <List setList={setList} list={filteredStories} />
+      {hasError && <p>{"Something went wrong..."}</p>}
+      {isLoading ? (
+        <p>{"Loading..."}</p>
+      ) : (
+        <List setList={setList} list={filteredStories} />
+      )}
     </>
   );
 };
