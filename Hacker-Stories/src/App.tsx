@@ -33,6 +33,11 @@ const stories: Array<Story> = [
   },
 ];
 
+const getAsyncStories = () =>
+  new Promise<{ data: { stories: Story[] } }>((resolve) => {
+    setTimeout(() => resolve({ data: { stories } }), 2000);
+  });
+
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
 
 interface ItemProps {
@@ -163,7 +168,13 @@ const useStorageState = (key: string, initialState: string) => {
 const App: React.FC<{}> = () => {
   console.log("rendering App");
   const { value, setValue } = useStorageState("search", "React");
-  const [list, setList] = useState(stories);
+  const [list, setList] = useState<Array<Story>>([]);
+
+  useEffect(() => {
+    getAsyncStories().then((result) => {
+      setList(result.data.stories);
+    });
+  }, []);
 
   const filteredStories = list.filter((item) =>
     item.title.toLowerCase().includes(value.toLowerCase())
