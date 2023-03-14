@@ -168,29 +168,85 @@ const useStorageState = (key: string, initialState: string) => {
   return { value, setValue };
 };
 
-const SET_STORIES = "SET_STORIES";
-const REMOVE_STORY = "REMOVE_STORY";
+enum Action {
+  SET_STORIES = "SET_STORIES",
+  REMOVE_STORY = "REMOVE_STORY",
+  STORIES_FETCH_INIT = "STORIES_FETCH_INIT",
+  STORIES_FETCH_SUCCESS = "STORIES_FETCH_SUCCESS",
+  STORIES_FETCH_FAILURE = "STORIES_FETCH_FAILURE",
+}
+
+type StoriesInitAction = {
+  type: Action.STORIES_FETCH_INIT;
+};
+
+type StoriesSuccessAction = {
+  type: Action.STORIES_FETCH_SUCCESS;
+  payload: Array<Story>;
+};
+
+type StoriesFialureAction = {
+  type: Action.STORIES_FETCH_FAILURE;
+};
 
 type StoriesSetAction = {
-  type: "SET_STORIES";
+  type: Action.SET_STORIES;
   payload: Array<Story>;
 };
 
 type StoriesRemoveAction = {
-  type: "REMOVE_STORY";
+  type: Action.REMOVE_STORY;
   payload: Story;
 };
 
-type StoriesAction = StoriesSetAction | StoriesRemoveAction;
+type StoriesAction =
+  | StoriesSetAction
+  | StoriesRemoveAction
+  | StoriesInitAction
+  | StoriesSuccessAction
+  | StoriesFialureAction;
 
-const storiesReducer = (state: Array<Story>, action: StoriesAction) => {
+interface StoryState {
+  data: Array<Story>;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+type StoryReducer = (state: StoryState, action: StoriesAction) => StoryState;
+
+const storiesReducer: StoryReducer = (
+  state: StoryState,
+  action: StoriesAction
+) => {
   switch (action.type) {
-    case SET_STORIES:
-      return action.payload;
-    case REMOVE_STORY:
-      return state.filter(
-        (story) => story.objectId !== action.payload.objectId
-      );
+    case Action.STORIES_FETCH_INIT:
+      return {
+        ...state,
+        isLoading: true,
+        isError: false,
+      };
+    case Action.STORIES_FETCH_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        data: action.payload,
+      };
+    case Action.STORIES_FETCH_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      };
+    case Action.SET_STORIES:
+      return { ...state, data: action.payload };
+    case Action.REMOVE_STORY:
+      return {
+        ...state,
+        data: state.data.filter(
+          (story) => story.objectId !== action.payload.objectId
+        ),
+      };
     default:
       throw new Error();
   }
@@ -199,21 +255,25 @@ const storiesReducer = (state: Array<Story>, action: StoriesAction) => {
 const App: React.FC<{}> = () => {
   console.log("rendering App");
   const { value, setValue } = useStorageState("search", "React");
-  const [stories, dispatachStories] = useReducer(storiesReducer, []);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [stories, dispatchStories] = useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
 
   useEffect(() => {
-    setIsLoading(true);
+    dispatchStories({ type: Action.STORIES_FETCH_INIT });
     getAsyncStories()
       .then((result) => {
-        dispatachStories({ type: "SET_STORIES", payload: result.data.stories });
-        setIsLoading(false);
+        dispatchStories({
+          type: Action.STORIES_FETCH_SUCCESS,
+          payload: result.data.stories,
+        });
       })
-      .catch(() => setHasError(true));
+      .catch(() => dispatchStories({ type: Action.STORIES_FETCH_FAILURE }));
   }, []);
 
-  const filteredStories = stories.filter((item) =>
+  const filteredStories = stories.data.filter((item) =>
     item.title.toLowerCase().includes(value.toLowerCase())
   );
 
@@ -236,11 +296,11 @@ const App: React.FC<{}> = () => {
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
       <hr />
-      {hasError && <p>{"Something went wrong..."}</p>}
-      {isLoading ? (
+      {stories.isError && <p>{"Something went wrong..."}</p>}
+      {stories.isLoading ? (
         <p>{"Loading..."}</p>
       ) : (
-        <List setList={dispatachStories} list={filteredStories} />
+        <List setList={dispatchStories} list={filteredStories} />
       )}
     </>
   );
