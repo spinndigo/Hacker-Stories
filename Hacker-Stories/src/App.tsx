@@ -1,5 +1,6 @@
 import {
   PropsWithChildren,
+  useCallback,
   useEffect,
   useReducer,
   useRef,
@@ -238,7 +239,7 @@ const App: React.FC<{}> = () => {
     isError: false,
   });
 
-  useEffect(() => {
+  const handleFetchStories = useCallback(() => {
     if (!value) return;
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
     fetch(`${API_ENDPOINT}${value}`)
@@ -251,6 +252,10 @@ const App: React.FC<{}> = () => {
       })
       .catch(() => dispatchStories({ type: Action.STORIES_FETCH_FAILURE }));
   }, [value]);
+
+  useEffect(() => {
+    handleFetchStories();
+  }, [handleFetchStories]);
 
   const filteredStories = stories.data.filter((item) =>
     item.title.toLowerCase().includes(value.toLowerCase())
