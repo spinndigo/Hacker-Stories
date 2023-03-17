@@ -21,30 +21,6 @@ interface Story {
   objectId: number;
 }
 
-const stories: Array<Story> = [
-  {
-    title: "React",
-    url: "https://reactjs.org/",
-    author: "Jordan Walke",
-    num_comments: 3,
-    points: 4,
-    objectId: 0,
-  },
-  {
-    title: "Redux",
-    url: "https://redux.js.org/",
-    author: "Dan Abramov, Andrew Clark",
-    num_comments: 2,
-    points: 5,
-    objectId: 1,
-  },
-];
-
-const getAsyncStories = () =>
-  new Promise<{ data: { stories: Story[] } }>((resolve) => {
-    setTimeout(() => resolve({ data: { stories } }), 2000);
-  });
-
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
 
 interface ItemProps {
@@ -263,8 +239,9 @@ const App: React.FC<{}> = () => {
   });
 
   useEffect(() => {
+    if (!value) return;
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
-    fetch(`${API_ENDPOINT}react`)
+    fetch(`${API_ENDPOINT}${value}`)
       .then((response) => response.json())
       .then((result) => {
         dispatchStories({
@@ -273,7 +250,7 @@ const App: React.FC<{}> = () => {
         });
       })
       .catch(() => dispatchStories({ type: Action.STORIES_FETCH_FAILURE }));
-  }, []);
+  }, [value]);
 
   const filteredStories = stories.data.filter((item) =>
     item.title.toLowerCase().includes(value.toLowerCase())
