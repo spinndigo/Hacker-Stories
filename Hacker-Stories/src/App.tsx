@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import "./App.css";
+import axios from "axios";
 
 const title = "React";
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
@@ -244,8 +245,8 @@ const App: React.FC<{}> = () => {
 
   const handleFetchStories = useCallback(() => {
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
-    fetch(url)
-      .then((response) => response.json())
+    axios
+      .get(url)
       .then((result) => {
         dispatchStories({
           type: Action.STORIES_FETCH_SUCCESS,
