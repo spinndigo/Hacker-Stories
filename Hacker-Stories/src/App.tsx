@@ -137,13 +137,15 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
 };
 
 const useStorageState = (key: string, initialState: string) => {
-  const [value, setValue] = useState(localStorage.getItem(key) || initialState);
+  const [searchTerm, setSearchTerm] = useState(
+    localStorage.getItem(key) || initialState
+  );
 
   useEffect(() => {
-    localStorage.setItem(key, value);
-  }, [value, key]);
+    localStorage.setItem(key, searchTerm);
+  }, [searchTerm, key]);
 
-  return { value, setValue };
+  return { searchTerm, setSearchTerm };
 };
 
 enum Action {
@@ -232,7 +234,8 @@ const storiesReducer: StoryReducer = (
 
 const App: React.FC<{}> = () => {
   console.log("rendering App");
-  const { value, setValue } = useStorageState("search", "React");
+  const { searchTerm, setSearchTerm } = useStorageState("search", "React");
+  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
   const [stories, dispatchStories] = useReducer(storiesReducer, {
     data: [],
     isLoading: false,
@@ -240,9 +243,8 @@ const App: React.FC<{}> = () => {
   });
 
   const handleFetchStories = useCallback(() => {
-    if (!value) return;
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
-    fetch(`${API_ENDPOINT}${value}`)
+    fetch(url)
       .then((response) => response.json())
       .then((result) => {
         dispatchStories({
@@ -251,18 +253,22 @@ const App: React.FC<{}> = () => {
         });
       })
       .catch(() => dispatchStories({ type: Action.STORIES_FETCH_FAILURE }));
-  }, [value]);
+  }, [url]);
 
   useEffect(() => {
     handleFetchStories();
   }, [handleFetchStories]);
 
   const filteredStories = stories.data.filter((item) =>
-    item.title.toLowerCase().includes(value.toLowerCase())
+    item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
   };
 
   return (
@@ -273,12 +279,15 @@ const App: React.FC<{}> = () => {
       </h1>
       <InputWithLabel
         isFocused
-        value={value}
-        onInputChange={handleSearch}
+        value={searchTerm}
+        onInputChange={handleSearchInput}
         id={"search"}
       >
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
+      <button type="button" disabled={!searchTerm} onClick={handleSearchSubmit}>
+        Submit
+      </button>
       <hr />
       {stories.isError && <p>{"Something went wrong..."}</p>}
       {stories.isLoading ? (
