@@ -233,8 +233,35 @@ const storiesReducer: StoryReducer = (
   }
 };
 
+interface SearchFormProps {
+  searchTerm: string;
+  handleSearchInput(event: React.ChangeEvent<HTMLInputElement>): void;
+  handleSearchSubmit(event: React.FormEvent<HTMLFormElement>): void;
+}
+
+const SearchForm: React.FC<SearchFormProps> = ({
+  searchTerm,
+  handleSearchInput,
+  handleSearchSubmit,
+}) => {
+  return (
+    <form onSubmit={handleSearchSubmit}>
+      <InputWithLabel
+        isFocused
+        value={searchTerm}
+        onInputChange={handleSearchInput}
+        id={"search"}
+      >
+        <strong> {"Search Term"} </strong>
+      </InputWithLabel>
+      <button type="submit" disabled={!searchTerm}>
+        Submit
+      </button>
+    </form>
+  );
+};
+
 const App: React.FC<{}> = () => {
-  console.log("rendering App");
   const { searchTerm, setSearchTerm } = useStorageState("search", "React");
   const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
   const [stories, dispatchStories] = useReducer(storiesReducer, {
@@ -269,27 +296,19 @@ const App: React.FC<{}> = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     setUrl(`${API_ENDPOINT}${searchTerm}`);
+    event.preventDefault();
   };
 
   return (
     <>
-      <h1>
-        {" "}
-        {welcome.greeting} {welcome.title}
-      </h1>
-      <InputWithLabel
-        isFocused
-        value={searchTerm}
-        onInputChange={handleSearchInput}
-        id={"search"}
-      >
-        <strong> {"Search Term"} </strong>
-      </InputWithLabel>
-      <button type="button" disabled={!searchTerm} onClick={handleSearchSubmit}>
-        Submit
-      </button>
+      <h1> My Hacker Stories</h1>
+      <SearchForm
+        searchTerm={searchTerm}
+        handleSearchInput={handleSearchInput}
+        handleSearchSubmit={handleSearchSubmit}
+      />
       <hr />
       {stories.isError && <p>{"Something went wrong..."}</p>}
       {stories.isLoading ? (
