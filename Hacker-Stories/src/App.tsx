@@ -8,6 +8,7 @@ import {
 } from "react";
 import "./App.css";
 import axios from "axios";
+import React from "react";
 
 const title = "React";
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
@@ -89,6 +90,7 @@ const List: React.FC<ListProps> = ({ list, setList }) => {
 };
 
 interface InputWithLabelProps {
+  children?: React.ReactNode;
   onInputChange(event: InputEvent): void;
   value: string;
   id: string;
@@ -96,46 +98,18 @@ interface InputWithLabelProps {
   isFocused?: boolean;
 }
 
-const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
-  onInputChange,
-  value,
-  id,
-  type = "text",
-  isFocused = false,
-  children,
-}) => {
-  console.log("rendering InputWithLabel");
+class InputWithLabel extends React.Component<InputWithLabelProps> {
+  render() {
+    const { id, value, type = "text", onInputChange, children } = this.props;
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isFocused && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isFocused]);
-
-  const handleChange = (event: InputEvent) => {
-    onInputChange(event);
-  };
-
-  return (
-    <>
-      <label htmlFor={id}>{children}: </label>
-      <input
-        ref={inputRef}
-        value={value}
-        id={id}
-        type={type}
-        onChange={handleChange}
-      />
-
-      <p>
-        {" "}
-        Searching for <strong>{value}</strong>{" "}
-      </p>
-    </>
-  );
-};
+    return (
+      <>
+        <label htmlFor={id}>{children}: </label>
+        <input value={value} id={id} type={type} onChange={onInputChange} />
+      </>
+    );
+  }
+}
 
 const useStorageState = (key: string, initialState: string) => {
   const [searchTerm, setSearchTerm] = useState(
