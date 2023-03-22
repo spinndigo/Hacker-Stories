@@ -41,24 +41,26 @@ const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
   points,
   handleRemove,
 }) => (
-  <li style={{ textAlign: "left" }}>
-    <span>
+  <li className="item" style={{ textAlign: "left" }}>
+    <span style={{ width: "40%" }}>
       {" "}
       <a href={url}>{title} </a> {" - "}
     </span>
-    <span>
+    <span style={{ width: "30%" }}>
       author: {author}
       {" - "}
     </span>
-    <span>
+    <span style={{ width: "10%" }}>
       comments: {num_comments}
       {" - "}
     </span>
-    <span>
+    <span style={{ width: "10%" }}>
       points: {points}
       {" - "}
     </span>
-    <button onClick={handleRemove}>{"Remove"}</button>
+    <button className="button button_small" onClick={handleRemove}>
+      {"Remove"}
+    </button>
   </li>
 );
 
@@ -120,8 +122,11 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
 
   return (
     <>
-      <label htmlFor={id}>{children}: </label>
+      <label className="label" htmlFor={id}>
+        {children}:{" "}
+      </label>
       <input
+        className="input"
         ref={inputRef}
         value={value}
         id={id}
@@ -245,7 +250,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   handleSearchSubmit,
 }) => {
   return (
-    <form onSubmit={handleSearchSubmit}>
+    <form className="search-form" onSubmit={handleSearchSubmit}>
       <InputWithLabel
         isFocused
         value={searchTerm}
@@ -254,7 +259,11 @@ const SearchForm: React.FC<SearchFormProps> = ({
       >
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <button
+        className="button button_large"
+        type="submit"
+        disabled={!searchTerm}
+      >
         Submit
       </button>
     </form>
@@ -302,21 +311,20 @@ const App: React.FC<{}> = () => {
   };
 
   return (
-    <>
-      <h1> My Hacker Stories</h1>
+    <div className="container">
+      <h1 className="headline-primary"> My Hacker Stories</h1>
       <SearchForm
         searchTerm={searchTerm}
         handleSearchInput={handleSearchInput}
         handleSearchSubmit={handleSearchSubmit}
       />
-      <hr />
       {stories.isError && <p>{"Something went wrong..."}</p>}
       {stories.isLoading ? (
         <p>{"Loading..."}</p>
       ) : (
         <List setList={dispatchStories} list={filteredStories} />
       )}
-    </>
+    </div>
   );
 };
 
