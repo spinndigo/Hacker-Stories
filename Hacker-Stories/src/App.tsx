@@ -10,11 +10,6 @@ import "./App.css";
 import axios from "axios";
 import React from "react";
 
-const title = "React";
-const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
-
-const welcome = { title: "React", greeting: "Hey" };
-
 interface Story {
   title: string;
   url: string;
@@ -69,26 +64,6 @@ interface ListProps {
   setList: any;
 }
 
-const List: React.FC<ListProps> = ({ list, setList }) => {
-  console.log("rendering List");
-
-  const handleRemove = (objectId: number) => {
-    setList({ type: "REMOVE_STORY", payload: { objectId } });
-  };
-
-  return (
-    <ul style={{ marginBottom: "20px" }}>
-      {list.map(({ objectId, ...item }) => (
-        <Item
-          key={objectId}
-          handleRemove={() => handleRemove(objectId)}
-          {...item}
-        />
-      ))}
-    </ul>
-  );
-};
-
 interface InputWithLabelProps {
   children?: React.ReactNode;
   onInputChange(event: InputEvent): void;
@@ -99,29 +74,36 @@ interface InputWithLabelProps {
 }
 
 class InputWithLabel extends React.Component<InputWithLabelProps> {
+  inputRef: React.RefObject<HTMLInputElement>;
+
+  constructor(props: InputWithLabelProps) {
+    super(props);
+    this.inputRef = React.createRef();
+  }
+
+  componentDidMount(): void {
+    if (this.props.isFocused && this.inputRef.current) {
+      this.inputRef.current.focus();
+    }
+  }
+
   render() {
     const { id, value, type = "text", onInputChange, children } = this.props;
 
     return (
       <>
         <label htmlFor={id}>{children}: </label>
-        <input value={value} id={id} type={type} onChange={onInputChange} />
+        <input
+          ref={this.inputRef}
+          value={value}
+          id={id}
+          type={type}
+          onChange={onInputChange}
+        />
       </>
     );
   }
 }
-
-const useStorageState = (key: string, initialState: string) => {
-  const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem(key) || initialState
-  );
-
-  useEffect(() => {
-    localStorage.setItem(key, searchTerm);
-  }, [searchTerm, key]);
-
-  return { searchTerm, setSearchTerm };
-};
 
 enum Action {
   SET_STORIES = "SET_STORIES",
@@ -168,44 +150,6 @@ interface StoryState {
 }
 
 type StoryReducer = (state: StoryState, action: StoriesAction) => StoryState;
-
-const storiesReducer: StoryReducer = (
-  state: StoryState,
-  action: StoriesAction
-) => {
-  switch (action.type) {
-    case Action.STORIES_FETCH_INIT:
-      return {
-        ...state,
-        isLoading: true,
-        isError: false,
-      };
-    case Action.STORIES_FETCH_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        isError: false,
-        data: action.payload,
-      };
-    case Action.STORIES_FETCH_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        isError: true,
-      };
-    case Action.SET_STORIES:
-      return { ...state, data: action.payload };
-    case Action.REMOVE_STORY:
-      return {
-        ...state,
-        data: state.data.filter(
-          (story) => story.objectId !== action.payload.objectId
-        ),
-      };
-    default:
-      throw new Error();
-  }
-};
 
 interface SearchFormProps {
   searchTerm: string;
