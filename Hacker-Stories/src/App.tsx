@@ -210,16 +210,14 @@ const storiesReducer: StoryReducer = (
 interface SearchFormProps {
   searchTerm: string;
   handleSearchInput(event: React.ChangeEvent<HTMLInputElement>): void;
-  handleSearchSubmit(event: React.FormEvent<HTMLFormElement>): void;
 }
 
 const SearchForm: React.FC<SearchFormProps> = ({
   searchTerm,
   handleSearchInput,
-  handleSearchSubmit,
 }) => {
   return (
-    <form onSubmit={handleSearchSubmit}>
+    <form onSubmit={() => undefined}>
       <InputWithLabel
         isFocused
         value={searchTerm}
@@ -235,63 +233,33 @@ const SearchForm: React.FC<SearchFormProps> = ({
   );
 };
 
-const App: React.FC<{}> = () => {
-  const { searchTerm, setSearchTerm } = useStorageState("search", "React");
-  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
-  const [stories, dispatchStories] = useReducer(storiesReducer, {
-    data: [],
-    isLoading: false,
-    isError: false,
-  });
+interface AppState {
+  searchTerm: string;
+}
 
-  const handleFetchStories = useCallback(async () => {
-    dispatchStories({ type: Action.STORIES_FETCH_INIT });
+class App extends React.Component<{}, AppState> {
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      searchTerm: "React",
+    };
+  }
 
-    try {
-      const result = await axios.get(url);
-      dispatchStories({
-        type: Action.STORIES_FETCH_SUCCESS,
-        payload: result.data.hits,
-      });
-    } catch {
-      dispatchStories({ type: Action.STORIES_FETCH_FAILURE });
-    }
-  }, [url]);
+  render() {
+    const { searchTerm } = this.state;
 
-  useEffect(() => {
-    handleFetchStories();
-  }, [handleFetchStories]);
-
-  const filteredStories = stories.data.filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
-    event.preventDefault();
-  };
-
-  return (
-    <>
-      <h1> My Hacker Stories</h1>
-      <SearchForm
-        searchTerm={searchTerm}
-        handleSearchInput={handleSearchInput}
-        handleSearchSubmit={handleSearchSubmit}
-      />
-      <hr />
-      {stories.isError && <p>{"Something went wrong..."}</p>}
-      {stories.isLoading ? (
-        <p>{"Loading..."}</p>
-      ) : (
-        <List setList={dispatchStories} list={filteredStories} />
-      )}
-    </>
-  );
-};
+    return (
+      <>
+        <h1> My Hacker Stories</h1>
+        <SearchForm
+          searchTerm={searchTerm}
+          handleSearchInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+            this.setState({ searchTerm: event?.target.value })
+          }
+        />
+      </>
+    );
+  }
+}
 
 export default App;
