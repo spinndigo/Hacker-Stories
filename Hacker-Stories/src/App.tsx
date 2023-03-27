@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import "./App.css";
+import { ReactComponent as Check } from "./assets/icon_done.svg";
 import axios from "axios";
 
 const title = "React";
@@ -264,7 +265,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         type="submit"
         disabled={!searchTerm}
       >
-        Submit
+        <Check height={"24px"} width={"24px"} fill="white" />
       </button>
     </form>
   );
