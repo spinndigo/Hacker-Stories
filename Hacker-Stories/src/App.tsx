@@ -8,6 +8,17 @@ import {
 } from "react";
 import "./App.css";
 import axios from "axios";
+import {
+  StyledItem,
+  StyledLabel,
+  StyledInput,
+  StyledButtonSmall,
+  StyledButtonLarge,
+  StyledSearchForm,
+  StyledColumn,
+  StyledContainer,
+  StyledHeadlinePrimary,
+} from "./elements";
 
 const title = "React";
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
@@ -41,25 +52,28 @@ const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
   points,
   handleRemove,
 }) => (
-  <li style={{ textAlign: "left" }}>
-    <span>
+  <StyledItem style={{ textAlign: "left" }}>
+    <StyledColumn width={"40%"}>
       {" "}
       <a href={url}>{title} </a> {" - "}
-    </span>
-    <span>
+    </StyledColumn>
+    <StyledColumn width={"30%"}>
       author: {author}
       {" - "}
-    </span>
-    <span>
+    </StyledColumn>
+    <StyledColumn width={"10%"}>
       comments: {num_comments}
       {" - "}
-    </span>
-    <span>
+    </StyledColumn>
+    <StyledColumn width={"10%"}>
       points: {points}
       {" - "}
-    </span>
-    <button onClick={handleRemove}>{"Remove"}</button>
-  </li>
+    </StyledColumn>
+    <StyledColumn width={"10%"}>
+      {" "}
+      <StyledButtonSmall onClick={handleRemove}>{"Remove"}</StyledButtonSmall>
+    </StyledColumn>
+  </StyledItem>
 );
 
 type ListItem = ItemProps & { objectId: number };
@@ -120,8 +134,8 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
 
   return (
     <>
-      <label htmlFor={id}>{children}: </label>
-      <input
+      <StyledLabel htmlFor={id}>{children}: </StyledLabel>
+      <StyledInput
         ref={inputRef}
         value={value}
         id={id}
@@ -245,7 +259,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   handleSearchSubmit,
 }) => {
   return (
-    <form onSubmit={handleSearchSubmit}>
+    <StyledSearchForm onSubmit={handleSearchSubmit}>
       <InputWithLabel
         isFocused
         value={searchTerm}
@@ -254,10 +268,10 @@ const SearchForm: React.FC<SearchFormProps> = ({
       >
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <StyledButtonLarge type="submit" disabled={!searchTerm}>
         Submit
-      </button>
-    </form>
+      </StyledButtonLarge>
+    </StyledSearchForm>
   );
 };
 
@@ -302,8 +316,8 @@ const App: React.FC<{}> = () => {
   };
 
   return (
-    <>
-      <h1> My Hacker Stories</h1>
+    <StyledContainer>
+      <StyledHeadlinePrimary> My Hacker Stories</StyledHeadlinePrimary>
       <SearchForm
         searchTerm={searchTerm}
         handleSearchInput={handleSearchInput}
@@ -316,7 +330,7 @@ const App: React.FC<{}> = () => {
       ) : (
         <List setList={dispatchStories} list={filteredStories} />
       )}
-    </>
+    </StyledContainer>
   );
 };
 
