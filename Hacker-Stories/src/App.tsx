@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from "react";
-import "./App.css";
+import styles from "./App.module.css";
+import clsx from "clsx";
 import axios from "axios";
 
 const title = "React";
@@ -41,7 +42,7 @@ const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
   points,
   handleRemove,
 }) => (
-  <li style={{ textAlign: "left" }}>
+  <li className={styles.item} style={{ textAlign: "left" }}>
     <span>
       {" "}
       <a href={url}>{title} </a> {" - "}
@@ -58,7 +59,12 @@ const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
       points: {points}
       {" - "}
     </span>
-    <button onClick={handleRemove}>{"Remove"}</button>
+    <button
+      className={`${styles.button} ${styles.buttonSmall}`}
+      onClick={handleRemove}
+    >
+      {"Remove"}
+    </button>
   </li>
 );
 
@@ -120,8 +126,11 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
 
   return (
     <>
-      <label htmlFor={id}>{children}: </label>
+      <label className={styles.label} htmlFor={id}>
+        {children}:{" "}
+      </label>
       <input
+        className={styles.input}
         ref={inputRef}
         value={value}
         id={id}
@@ -244,8 +253,9 @@ const SearchForm: React.FC<SearchFormProps> = ({
   handleSearchInput,
   handleSearchSubmit,
 }) => {
+  const isLarge = true; // demonstration of conditional styling with clsx
   return (
-    <form onSubmit={handleSearchSubmit}>
+    <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
       <InputWithLabel
         isFocused
         value={searchTerm}
@@ -254,7 +264,11 @@ const SearchForm: React.FC<SearchFormProps> = ({
       >
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <button
+        className={clsx(styles.button, { [styles.buttonLarge]: isLarge })}
+        type="submit"
+        disabled={!searchTerm}
+      >
         Submit
       </button>
     </form>
@@ -302,8 +316,8 @@ const App: React.FC<{}> = () => {
   };
 
   return (
-    <>
-      <h1> My Hacker Stories</h1>
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}> My Hacker Stories</h1>
       <SearchForm
         searchTerm={searchTerm}
         handleSearchInput={handleSearchInput}
@@ -316,7 +330,7 @@ const App: React.FC<{}> = () => {
       ) : (
         <List setList={dispatchStories} list={filteredStories} />
       )}
-    </>
+    </div>
   );
 };
 
