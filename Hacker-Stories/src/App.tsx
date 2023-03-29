@@ -9,10 +9,7 @@ import {
 import "./App.css";
 import axios from "axios";
 
-const title = "React";
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
-
-const welcome = { title: "React", greeting: "Hey" };
 
 interface Story {
   title: string;
