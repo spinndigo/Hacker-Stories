@@ -20,7 +20,7 @@ interface Story {
   author: string;
   num_comments: number;
   points: number;
-  objectId: number;
+  objectID: string;
 }
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
@@ -62,7 +62,7 @@ const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
   </li>
 );
 
-type ListItem = ItemProps & { objectId: number };
+type ListItem = ItemProps & { objectID: string };
 interface ListProps {
   list: Array<ListItem>;
   setList: any;
@@ -71,16 +71,16 @@ interface ListProps {
 const List: React.FC<ListProps> = ({ list, setList }) => {
   console.log("rendering List");
 
-  const handleRemove = (objectId: number) => {
-    setList({ type: "REMOVE_STORY", payload: { objectId } });
+  const handleRemove = (objectID: string) => {
+    setList({ type: "REMOVE_STORY", payload: { objectID } });
   };
 
   return (
     <ul style={{ marginBottom: "20px" }}>
-      {list.map(({ objectId, ...item }) => (
+      {list.map(({ objectID, ...item }) => (
         <Item
-          key={objectId}
-          handleRemove={() => handleRemove(objectId)}
+          key={objectID}
+          handleRemove={() => handleRemove(objectID)}
           {...item}
         />
       ))}
@@ -231,7 +231,7 @@ const storiesReducer: StoryReducer = (
       return {
         ...state,
         data: state.data.filter(
-          (story) => story.objectId !== action.payload.objectId
+          (story) => story.objectID !== action.payload.objectID
         ),
       };
     default:
