@@ -138,12 +138,18 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
 };
 
 const useStorageState = (key: string, initialState: string) => {
+  const isMounted = useRef(false);
   const [searchTerm, setSearchTerm] = useState(
     localStorage.getItem(key) || initialState
   );
 
   useEffect(() => {
-    localStorage.setItem(key, searchTerm);
+    if (!isMounted.current) {
+      isMounted.current = true; // set true after first render
+    } else {
+      console.log("performing storage set");
+      localStorage.setItem(key, searchTerm);
+    }
   }, [searchTerm, key]);
 
   return { searchTerm, setSearchTerm };
@@ -285,6 +291,7 @@ const App: React.FC<{}> = () => {
   }, [url]);
 
   useEffect(() => {
+    console.log("fetching stories..");
     handleFetchStories();
   }, [handleFetchStories]);
 
