@@ -2,12 +2,14 @@ import {
   PropsWithChildren,
   useCallback,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
 } from "react";
 import "./App.css";
 import axios from "axios";
+import React from "react";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -65,7 +67,7 @@ interface ListProps {
   setList: any;
 }
 
-const List: React.FC<ListProps> = ({ list, setList }) => {
+const List: React.FC<ListProps> = React.memo(({ list, setList }) => {
   console.log("rendering List");
 
   const handleRemove = (objectID: string) => {
@@ -83,7 +85,7 @@ const List: React.FC<ListProps> = ({ list, setList }) => {
       ))}
     </ul>
   );
-};
+});
 
 interface InputWithLabelProps {
   onInputChange(event: InputEvent): void;
@@ -101,8 +103,6 @@ const InputWithLabel: React.FC<PropsWithChildren<InputWithLabelProps>> = ({
   isFocused = false,
   children,
 }) => {
-  console.log("rendering InputWithLabel");
-
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -144,7 +144,6 @@ const useStorageState = (key: string, initialState: string) => {
     if (!isMounted.current) {
       isMounted.current = true; // set true after first render
     } else {
-      console.log("performing storage set");
       localStorage.setItem(key, searchTerm);
     }
   }, [searchTerm, key]);
@@ -264,7 +263,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
   );
 };
 
+const getSumComments = (stories: Array<Story>) => {
+  console.log("Computing Sum Comments..");
+
+  return stories.reduce((result, value) => result + value.num_comments, 0);
+};
+
 const App: React.FC<{}> = () => {
+  console.log("rendering App");
   const { searchTerm, setSearchTerm } = useStorageState("search", "React");
   const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
   const [stories, dispatchStories] = useReducer(storiesReducer, {
@@ -272,6 +278,9 @@ const App: React.FC<{}> = () => {
     isLoading: false,
     isError: false,
   });
+  const sumComments = useMemo(() => getSumComments(stories.data), [stories]);
+
+  const memoizedDispatchStories = useCallback(dispatchStories, []);
 
   const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
@@ -288,12 +297,15 @@ const App: React.FC<{}> = () => {
   }, [url]);
 
   useEffect(() => {
-    console.log("fetching stories..");
     handleFetchStories();
   }, [handleFetchStories]);
 
-  const filteredStories = stories.data.filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStories = useMemo(
+    () =>
+      stories.data.filter((item) =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [stories]
   );
 
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -307,7 +319,7 @@ const App: React.FC<{}> = () => {
 
   return (
     <>
-      <h1> My Hacker Stories</h1>
+      <h1> {`My Hacker Stories with ${sumComments} comments`}</h1>
       <SearchForm
         searchTerm={searchTerm}
         handleSearchInput={handleSearchInput}
@@ -318,7 +330,7 @@ const App: React.FC<{}> = () => {
       {stories.isLoading ? (
         <p>{"Loading..."}</p>
       ) : (
-        <List setList={dispatchStories} list={filteredStories} />
+        <List setList={memoizedDispatchStories} list={filteredStories} />
       )}
     </>
   );
