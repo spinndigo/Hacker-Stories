@@ -11,3 +11,5 @@ styling-in-react -> css-in-react   ( svg part will be in this branch as well )
 styling-in-react -> css-modules-in-react
 styling-in-react -> styled-components-in-react
 
+Note: I will skip the typescript chapter because I began the project with it already in use
+
