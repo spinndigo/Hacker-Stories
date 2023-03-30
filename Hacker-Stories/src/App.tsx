@@ -172,7 +172,7 @@ type StoriesSetAction = {
   payload: Array<Story>;
 };
 
-type StoriesRemoveAction = {
+export type StoriesRemoveAction = {
   type: Action.REMOVE_STORY;
   payload: Story;
 };
@@ -318,3 +318,5 @@ const App: React.FC<{}> = () => {
 };
 
 export default App;
+
+export { storiesReducer, SearchForm, InputWithLabel, List, Item, Action };
