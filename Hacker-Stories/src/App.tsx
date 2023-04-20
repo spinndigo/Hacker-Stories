@@ -43,10 +43,7 @@ const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
       {" "}
       <a href={url}>{title} </a> {" - "}
     </span>
-    <span>
-      author: {author}
-      {" - "}
-    </span>
+    <span>{author}</span>
     <span>
       comments: {num_comments}
       {" - "}
@@ -249,7 +246,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
         onInputChange={handleSearchInput}
         id={"search"}
       >
-        <strong> {"Search Term"} </strong>
+        <strong>{"Search Term"}</strong>
       </InputWithLabel>
       <button type="submit" disabled={!searchTerm}>
         Submit

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import App, {
   storiesReducer,
   Item,
@@ -8,6 +8,8 @@ import App, {
   Action,
   StoriesRemoveAction,
 } from "./App";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+
 import React from "react";
 
 const storyOne = {
@@ -53,6 +55,64 @@ describe("stories reducer", () => {
     };
     const newState = storiesReducer(state, removeAction);
     expect(newState).toStrictEqual(expectedState);
+  });
+});
+
+describe("Item", () => {
+  it("renders all properties", () => {
+    render(<Item handleRemove={() => undefined} {...storyOne} />);
+    expect(screen.getByText("Jordan Walke")).toBeInTheDocument();
+    expect(screen.getByText("React")).toHaveAttribute(
+      "href",
+      "https://reactjs.org/"
+    );
+  });
+
+  it("renders a clickable remove button", () => {
+    render(<Item handleRemove={() => undefined} {...storyOne} />);
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  it("calls the callback handler after clicking remove", () => {
+    const handleRemove = vi.fn();
+    render(<Item handleRemove={handleRemove} {...storyOne} />);
+    fireEvent.click(screen.getByRole("button"));
+    expect(handleRemove).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("SearchForm", () => {
+  const props = {
+    searchTerm: "React",
+    handleSearchInput: vi.fn(),
+    handleSearchSubmit: vi.fn(),
+  };
+  const renderForm = () => {
+    render(<SearchForm {...props} />);
+  };
+
+  it("renders the input field with its value", () => {
+    renderForm();
+    expect(screen.getByDisplayValue("React")).toBeInTheDocument();
+  });
+
+  it("renders correct label", () => {
+    renderForm();
+    expect(screen.getByLabelText(/Search Term/)).toBeInTheDocument();
+  });
+
+  it("calls handleSearchInput on input field change", () => {
+    renderForm();
+    fireEvent.change(screen.getByDisplayValue("React"), {
+      target: { value: "Redux" },
+    });
+    expect(props.handleSearchInput).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls handleSearchSubmit on button submit click", () => {
+    renderForm();
+    fireEvent.submit(screen.getByRole('button'));
+    expect(props.handleSearchSubmit).toHaveBeenCalledTimes(1);
   });
 });
 
