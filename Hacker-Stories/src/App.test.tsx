@@ -117,6 +117,11 @@ describe("SearchForm", () => {
     fireEvent.submit(screen.getByRole("button"));
     expect(props.handleSearchSubmit).toHaveBeenCalledTimes(1);
   });
+
+  it("renders snapshot", () => {
+    const { container } = render(<SearchForm {...props} />);
+    expect(container.firstChild).toMatchSnapshot();
+  });
 });
 
 describe("App Component", () => {
