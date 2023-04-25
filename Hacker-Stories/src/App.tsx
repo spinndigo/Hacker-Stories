@@ -3,6 +3,7 @@ import "./App.css";
 import axios from "axios";
 import { useStorageState } from "./hooks";
 import { List, SearchForm } from "./components";
+import { Action, storiesReducer } from "./storiesReducer";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 

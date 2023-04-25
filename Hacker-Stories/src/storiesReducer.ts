@@ -7,7 +7,7 @@ interface Story {
   objectID: string;
 }
 
-enum Action {
+export enum Action {
   SET_STORIES = "SET_STORIES",
   REMOVE_STORY = "REMOVE_STORY",
   STORIES_FETCH_INIT = "STORIES_FETCH_INIT",
@@ -53,7 +53,7 @@ interface StoryState {
 
 type StoryReducer = (state: StoryState, action: StoriesAction) => StoryState;
 
-const storiesReducer: StoryReducer = (
+export const storiesReducer: StoryReducer = (
   state: StoryState,
   action: StoriesAction
 ) => {
