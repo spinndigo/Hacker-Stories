@@ -2,8 +2,8 @@ import { useCallback, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import axios from "axios";
 import { useStorageState } from "./hooks";
-import { List, SearchForm } from "./components";
-import { Action, storiesReducer } from "./storiesReducer";
+import { List, SearchForm, SortCards } from "./components";
+import { Action, Story, storiesReducer } from "./storiesReducer";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -15,7 +15,9 @@ const App: React.FC<{}> = () => {
     isLoading: false,
     isError: false,
   });
+  const [sortedStories, setSortedStories] = useState<Array<Story>>([]);
 
+  console.log(stories.data);
   const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
 
@@ -25,6 +27,7 @@ const App: React.FC<{}> = () => {
         type: Action.STORIES_FETCH_SUCCESS,
         payload: result.data.hits,
       });
+      setSortedStories(result.data.hits);
     } catch {
       dispatchStories({ type: Action.STORIES_FETCH_FAILURE });
     }
@@ -34,7 +37,7 @@ const App: React.FC<{}> = () => {
     handleFetchStories();
   }, [handleFetchStories]);
 
-  const filteredStories = stories.data.filter((item) =>
+  const filteredStories = sortedStories.filter((item) =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -60,7 +63,10 @@ const App: React.FC<{}> = () => {
       {stories.isLoading ? (
         <p>{"Loading..."}</p>
       ) : (
-        <List setList={dispatchStories} list={filteredStories} />
+        <>
+          <SortCards setSortedStories={setSortedStories} />
+          <List setList={dispatchStories} list={filteredStories} />
+        </>
       )}
     </>
   );

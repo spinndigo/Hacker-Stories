@@ -1,5 +1,5 @@
 
-interface ItemProps {
+ interface Item {
     title: string;
     url: string;
     author: string;
@@ -7,7 +7,7 @@ interface ItemProps {
     points: number;
   }
   
-  const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
+  const Item: React.FC<Item & { handleRemove(): void }> = ({
     url,
     title,
     author,
@@ -36,7 +36,7 @@ interface ItemProps {
     </li>
   );
   
-  type ListItem = ItemProps & { objectID: string };
+  type ListItem = Item & { objectID: string };
   interface ListProps {
     list: Array<ListItem>;
     setList: any;

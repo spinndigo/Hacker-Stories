@@ -1,4 +1,4 @@
-interface Story {
+export interface Story {
   title: string;
   url: string;
   author: string;
