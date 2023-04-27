@@ -27,13 +27,20 @@ export const SortCard: React.FC<Props> = ({
       onClick={onClick}
       style={{
         display: "flex",
-        height: "150px",
-        width: "300px",
+        flexWrap: "wrap",
+        height: "100px",
+        width: "200px",
         backgroundColor: "grey",
       }}
     >
-      <p> {label} </p>
-      <div> {isAsc ? "asc" : "desc"} </div>
+      <div style={{ width: "100%", fontSize: "24px", fontWeight: "bold" }}>
+        {" "}
+        {label}{" "}
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+        {" "}
+        {"sort by: "} {isAsc ? "asc" : "desc"}{" "}
+      </div>
     </div>
   );
 };
