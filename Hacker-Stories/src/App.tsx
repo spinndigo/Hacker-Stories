@@ -9,7 +9,9 @@ const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
 const App: React.FC<{}> = () => {
   const { searchTerm, setSearchTerm } = useStorageState("search", "React");
-  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
+  const [urls, setUrls] = useState<Array<string>>([
+    `${API_ENDPOINT}${searchTerm}`,
+  ]);
   const [stories, dispatchStories] = useReducer(storiesReducer, {
     data: [],
     isLoading: false,
@@ -17,12 +19,11 @@ const App: React.FC<{}> = () => {
   });
   const [sortedStories, setSortedStories] = useState<Array<Story>>([]);
 
-  console.log(stories.data);
   const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
 
     try {
-      const result = await axios.get(url);
+      const result = await axios.get(urls[urls.length - 1]);
       dispatchStories({
         type: Action.STORIES_FETCH_SUCCESS,
         payload: result.data.hits,
@@ -31,7 +32,7 @@ const App: React.FC<{}> = () => {
     } catch {
       dispatchStories({ type: Action.STORIES_FETCH_FAILURE });
     }
-  }, [url]);
+  }, [urls]);
 
   useEffect(() => {
     handleFetchStories();
@@ -46,7 +47,12 @@ const App: React.FC<{}> = () => {
   };
 
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
+    setUrls((prev) => {
+      const newUrls = prev.slice();
+      newUrls.push(`${API_ENDPOINT}${searchTerm}`);
+      if (newUrls.length > 5) newUrls.shift();
+      return newUrls;
+    });
     event.preventDefault();
   };
 
@@ -58,6 +64,18 @@ const App: React.FC<{}> = () => {
         handleSearchInput={handleSearchInput}
         handleSearchSubmit={handleSearchSubmit}
       />
+      <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+        {"or try one of these previous searches: "}
+        {urls.slice(0, -1).map((url) => (
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => setSearchTerm(url.slice(url.indexOf("=") + 1))}
+          >
+            {" "}
+            {url.slice(url.indexOf("=") + 1)}{" "}
+          </span>
+        ))}
+      </div>
       <hr />
       {stories.isError && <p>{"Something went wrong..."}</p>}
       {stories.isLoading ? (
