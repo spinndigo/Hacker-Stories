@@ -15,13 +15,18 @@ export enum Action {
   STORIES_FETCH_FAILURE = "STORIES_FETCH_FAILURE",
 }
 
+type SetPayload = {
+  list: Array<Story>;
+  page: number;
+};
+
 type StoriesInitAction = {
   type: Action.STORIES_FETCH_INIT;
 };
 
 type StoriesSuccessAction = {
   type: Action.STORIES_FETCH_SUCCESS;
-  payload: Array<Story>;
+  payload: SetPayload;
 };
 
 type StoriesFailureAction = {
@@ -30,7 +35,7 @@ type StoriesFailureAction = {
 
 type StoriesSetAction = {
   type: Action.SET_STORIES;
-  payload: Array<Story>;
+  payload: SetPayload;
 };
 
 type StoriesRemoveAction = {
@@ -46,7 +51,7 @@ type StoriesAction =
   | StoriesFailureAction;
 
 interface StoryState {
-  data: Array<Story>;
+  data: SetPayload;
   isLoading: boolean;
   isError: boolean;
 }
@@ -69,7 +74,13 @@ export const storiesReducer: StoryReducer = (
         ...state,
         isLoading: false,
         isError: false,
-        data: action.payload,
+        data: {
+          list:
+            action.payload.page === 0
+              ? action.payload.list
+              : state.data.list.concat(action.payload.list),
+          page: action.payload.page,
+        },
       };
     case Action.STORIES_FETCH_FAILURE:
       return {
@@ -82,9 +93,12 @@ export const storiesReducer: StoryReducer = (
     case Action.REMOVE_STORY:
       return {
         ...state,
-        data: state.data.filter(
-          (story) => story.objectID !== action.payload.objectID
-        ),
+        data: {
+          list: state.data.list.filter(
+            (story) => story.objectID !== action.payload.objectID
+          ),
+          page: state.data.page,
+        },
       };
     default:
       throw new Error();

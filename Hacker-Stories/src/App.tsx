@@ -5,18 +5,29 @@ import { useStorageState } from "./hooks";
 import { List, SearchForm, SortCards } from "./components";
 import { Action, Story, storiesReducer } from "./storiesReducer";
 
-const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+const API_BASE = "https://hn.algolia.com/api/v1";
+const API_SEARCH = "/search";
+const PARAM_SEARCH = "query=";
+const PARAM_PAGE = "page=";
+
+const getUrl = (searchTerm: string, page: number) =>
+  `${API_BASE}${API_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`;
+
+const extractSearchTerm = (url: string) =>
+  url
+    .substring(url.lastIndexOf("?") + 1, url.lastIndexOf("&"))
+    .replace(PARAM_SEARCH, "");
 
 const App: React.FC<{}> = () => {
   const { searchTerm, setSearchTerm } = useStorageState("search", "React");
-  const [urls, setUrls] = useState<Array<string>>([
-    `${API_ENDPOINT}${searchTerm}`,
-  ]);
   const [stories, dispatchStories] = useReducer(storiesReducer, {
-    data: [],
+    data: { list: [], page: 0 },
     isLoading: false,
     isError: false,
   });
+  const [urls, setUrls] = useState<Array<string>>([
+    getUrl(searchTerm, stories.data.page),
+  ]);
   const [sortedStories, setSortedStories] = useState<Array<Story>>([]);
 
   const handleFetchStories = useCallback(async () => {
@@ -26,9 +37,9 @@ const App: React.FC<{}> = () => {
       const result = await axios.get(urls[urls.length - 1]);
       dispatchStories({
         type: Action.STORIES_FETCH_SUCCESS,
-        payload: result.data.hits,
+        payload: { list: result.data.hits, page: result.data.page },
       });
-      setSortedStories(result.data.hits);
+      setSortedStories(stories.data.list);
     } catch {
       dispatchStories({ type: Action.STORIES_FETCH_FAILURE });
     }
@@ -42,18 +53,29 @@ const App: React.FC<{}> = () => {
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleSearch = (searchTerm: string, page: number) => {
+    const url = getUrl(searchTerm, page);
+    setUrls((prev) => {
+      const newUrls = prev.slice();
+      newUrls.push(url); // ??
+      if (newUrls.length > 5) newUrls.shift();
+      return newUrls;
+    });
+  };
+
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    setUrls((prev) => {
-      const newUrls = prev.slice();
-      newUrls.push(`${API_ENDPOINT}${searchTerm}`);
-      if (newUrls.length > 5) newUrls.shift();
-      return newUrls;
-    });
+    handleSearch(searchTerm, 0);
     event.preventDefault();
+  };
+
+  const handleMore = () => {
+    const lastUrl = urls[urls.length - 1];
+    const searchTerm = extractSearchTerm(lastUrl);
+    handleSearch(searchTerm, stories.data.page + 1);
   };
 
   return (
@@ -72,7 +94,7 @@ const App: React.FC<{}> = () => {
             onClick={() => setSearchTerm(url.slice(url.indexOf("=") + 1))}
           >
             {" "}
-            {url.slice(url.indexOf("=") + 1)}{" "}
+            {extractSearchTerm(url)}{" "}
           </span>
         ))}
       </div>
@@ -84,6 +106,17 @@ const App: React.FC<{}> = () => {
         <>
           <SortCards setSortedStories={setSortedStories} />
           <List setList={dispatchStories} list={filteredStories} />
+          <button
+            onClick={handleMore}
+            style={{
+              height: "50px",
+              width: "200px",
+              backgroundColor: "darkorange",
+              fontWeight: "bold",
+            }}
+          >
+            {"More"}
+          </button>
         </>
       )}
     </>
