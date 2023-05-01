@@ -1,13 +1,17 @@
 import { Dispatch, SetStateAction } from "react";
-import { Story } from "../storiesReducer";
+import { StoriesAction, Story, StoryState } from "../storiesReducer";
 import { SortCard } from "./SortCard";
 import { sortComments, sortTopic, sortUpvotes } from "../sortUtils";
 
-interface Props {
-  setSortedStories: Dispatch<SetStateAction<Array<Story>>>;
+export interface SortCardsProps {
+  storyReducer: React.Dispatch<StoriesAction>;
+  stories: StoryState;
 }
 
-export const SortCards: React.FC<Props> = ({ setSortedStories }) => {
+export const SortCards: React.FC<SortCardsProps> = ({
+  storyReducer,
+  stories,
+}) => {
   return (
     <div
       style={{
@@ -20,17 +24,20 @@ export const SortCards: React.FC<Props> = ({ setSortedStories }) => {
       <SortCard
         label="title"
         sorter={sortTopic}
-        setSortedStories={setSortedStories}
+        stories={stories}
+        storyReducer={storyReducer}
       />
       <SortCard
         label="upvotes"
         sorter={sortUpvotes}
-        setSortedStories={setSortedStories}
+        stories={stories}
+        storyReducer={storyReducer}
       />
       <SortCard
         label="comments"
         sorter={sortComments}
-        setSortedStories={setSortedStories}
+        stories={stories}
+        storyReducer={storyReducer}
       />
     </div>
   );

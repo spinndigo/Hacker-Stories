@@ -1,24 +1,29 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { StorySorter } from "../sortUtils";
-import { Story } from "../storiesReducer";
+import { Action, Story } from "../storiesReducer";
+import { SortCardsProps } from "./SortCards";
 
 interface Props {
   label: string;
   sorter: StorySorter;
-  setSortedStories: Dispatch<SetStateAction<Array<Story>>>;
 }
 
-export const SortCard: React.FC<Props> = ({
+export const SortCard: React.FC<Props & SortCardsProps> = ({
   label,
   sorter,
-  setSortedStories,
+  stories,
+  storyReducer,
 }) => {
   const [isAsc, setIsAsc] = useState(true);
   const onClick = () => {
-    setSortedStories((prev) => {
-      const sorted = sorter(prev, isAsc);
-      return sorted;
+    storyReducer({
+      type: Action.SET_STORIES,
+      payload: {
+        list: sorter(stories.data.list, isAsc),
+        page: stories.data.page,
+      },
     });
+
     setIsAsc((prev) => !prev);
   };
 

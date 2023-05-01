@@ -27,7 +27,6 @@ const App: React.FC<{}> = () => {
   const [urls, setUrls] = useState<Array<string>>([
     getUrl(searchTerm, stories.data.page),
   ]);
-  const [sortedStories, setSortedStories] = useState<Array<Story>>([]);
 
   const handleFetchStories = useCallback(async () => {
     dispatchStories({ type: Action.STORIES_FETCH_INIT });
@@ -38,7 +37,6 @@ const App: React.FC<{}> = () => {
         type: Action.STORIES_FETCH_SUCCESS,
         payload: { list: result.data.hits, page: result.data.page },
       });
-      setSortedStories(stories.data.list);
     } catch {
       dispatchStories({ type: Action.STORIES_FETCH_FAILURE });
     }
@@ -48,7 +46,7 @@ const App: React.FC<{}> = () => {
     handleFetchStories();
   }, [handleFetchStories]);
 
-  const filteredStories = sortedStories.filter((item) =>
+  const filteredStories = stories.data.list.filter((item) =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -98,8 +96,8 @@ const App: React.FC<{}> = () => {
         ))}
       </div>
       <hr />
-      <SortCards setSortedStories={setSortedStories} />
-      <List setList={dispatchStories} list={filteredStories} />
+      <SortCards stories={stories} storyReducer={dispatchStories} />
+      <List listReducer={dispatchStories} list={filteredStories} />
       {stories.isError && <p>{"Something went wrong..."}</p>}
       {stories.isLoading ? (
         <p>{"Loading..."}</p>

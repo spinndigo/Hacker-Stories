@@ -1,3 +1,5 @@
+import { Action, StoriesAction } from "../storiesReducer";
+
 interface ItemProps {
   title: string;
   url: string;
@@ -36,14 +38,12 @@ export const Item: React.FC<ItemProps & { handleRemove(): void }> = ({
 type ListItem = ItemProps & { objectID: string };
 interface ListProps {
   list: Array<ListItem>;
-  setList: any;
+  listReducer: React.Dispatch<StoriesAction>;
 }
 
-export const List: React.FC<ListProps> = ({ list, setList }) => {
-  console.log("rendering List");
-
+export const List: React.FC<ListProps> = ({ list, listReducer }) => {
   const handleRemove = (objectID: string) => {
-    setList({ type: "REMOVE_STORY", payload: { objectID } });
+    listReducer({ type: Action.REMOVE_STORY, payload: { objectID } });
   };
 
   return (
@@ -51,8 +51,8 @@ export const List: React.FC<ListProps> = ({ list, setList }) => {
       {list.map(({ objectID, ...item }) => (
         <Item
           key={objectID}
-          handleRemove={() => handleRemove(objectID)}
           {...item}
+          handleRemove={() => handleRemove(objectID)}
         />
       ))}
     </ul>

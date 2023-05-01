@@ -33,24 +33,26 @@ type StoriesFailureAction = {
   type: Action.STORIES_FETCH_FAILURE;
 };
 
-type StoriesSetAction = {
+type RemovePayload = { objectID: Story["objectID"] };
+
+export type StoriesSetAction = {
   type: Action.SET_STORIES;
   payload: SetPayload;
 };
 
-type StoriesRemoveAction = {
+export type StoriesRemoveAction = {
   type: Action.REMOVE_STORY;
-  payload: Story;
+  payload: RemovePayload;
 };
 
-type StoriesAction =
+export type StoriesAction =
   | StoriesSetAction
   | StoriesRemoveAction
   | StoriesInitAction
   | StoriesSuccessAction
   | StoriesFailureAction;
 
-interface StoryState {
+export interface StoryState {
   data: SetPayload;
   isLoading: boolean;
   isError: boolean;

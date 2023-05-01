@@ -3,7 +3,7 @@ import axios from "axios";
 import App from "./App";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Item, SearchForm } from "./components";
-import { Action, storiesReducer } from "./storiesReducer";
+import { Action, StoriesRemoveAction, storiesReducer } from "./storiesReducer";
 
 const storyOne = {
   title: "React",
@@ -40,11 +40,15 @@ describe("stories reducer", () => {
   it("removes a story from all stories", () => {
     const removeAction: StoriesRemoveAction = {
       type: Action.REMOVE_STORY,
-      payload: storyOne,
+      payload: { objectID: storyOne.objectID},
     };
-    const state = { data: stories, isLoading: false, isError: false };
+    const state = {
+      data: { list: stories, page: 0 },
+      isLoading: false,
+      isError: false,
+    };
     const expectedState = {
-      data: [storyTwo],
+      data: { list: [storyTwo], page: 0 },
       isLoading: false,
       isError: false,
     };
