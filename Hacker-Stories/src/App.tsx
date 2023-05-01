@@ -17,7 +17,6 @@ const extractSearchTerm = (url: string) =>
   url
     .substring(url.lastIndexOf("?") + 1, url.lastIndexOf("&"))
     .replace(PARAM_SEARCH, "");
-
 const App: React.FC<{}> = () => {
   const { searchTerm, setSearchTerm } = useStorageState("search", "React");
   const [stories, dispatchStories] = useReducer(storiesReducer, {
@@ -91,7 +90,7 @@ const App: React.FC<{}> = () => {
         {urls.slice(0, -1).map((url) => (
           <span
             style={{ cursor: "pointer" }}
-            onClick={() => setSearchTerm(url.slice(url.indexOf("=") + 1))}
+            onClick={() => setSearchTerm(extractSearchTerm(url))}
           >
             {" "}
             {extractSearchTerm(url)}{" "}
@@ -99,14 +98,15 @@ const App: React.FC<{}> = () => {
         ))}
       </div>
       <hr />
+      <SortCards setSortedStories={setSortedStories} />
+      <List setList={dispatchStories} list={filteredStories} />
       {stories.isError && <p>{"Something went wrong..."}</p>}
       {stories.isLoading ? (
         <p>{"Loading..."}</p>
       ) : (
         <>
-          <SortCards setSortedStories={setSortedStories} />
-          <List setList={dispatchStories} list={filteredStories} />
           <button
+            type="button"
             onClick={handleMore}
             style={{
               height: "50px",
