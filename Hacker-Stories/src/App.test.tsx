@@ -1,17 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import axios from "axios";
-import App, {
-  storiesReducer,
-  Item,
-  List,
-  SearchForm,
-  InputWithLabel,
-  Action,
-  StoriesRemoveAction,
-} from "./App";
+import App from "./App";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-
-import React from "react";
+import { Item, SearchForm } from "./components";
+import { Action, storiesReducer } from "./storiesReducer";
 
 const storyOne = {
   title: "React",
