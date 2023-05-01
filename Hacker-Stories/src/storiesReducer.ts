@@ -1,4 +1,4 @@
-interface Story {
+export interface Story {
   title: string;
   url: string;
   author: string;
@@ -15,38 +15,45 @@ export enum Action {
   STORIES_FETCH_FAILURE = "STORIES_FETCH_FAILURE",
 }
 
+type SetPayload = {
+  list: Array<Story>;
+  page: number;
+};
+
 type StoriesInitAction = {
   type: Action.STORIES_FETCH_INIT;
 };
 
 type StoriesSuccessAction = {
   type: Action.STORIES_FETCH_SUCCESS;
-  payload: Array<Story>;
+  payload: SetPayload;
 };
 
 type StoriesFailureAction = {
   type: Action.STORIES_FETCH_FAILURE;
 };
 
-type StoriesSetAction = {
+type RemovePayload = { objectID: Story["objectID"] };
+
+export type StoriesSetAction = {
   type: Action.SET_STORIES;
-  payload: Array<Story>;
+  payload: SetPayload;
 };
 
-type StoriesRemoveAction = {
+export type StoriesRemoveAction = {
   type: Action.REMOVE_STORY;
-  payload: Story;
+  payload: RemovePayload;
 };
 
-type StoriesAction =
+export type StoriesAction =
   | StoriesSetAction
   | StoriesRemoveAction
   | StoriesInitAction
   | StoriesSuccessAction
   | StoriesFailureAction;
 
-interface StoryState {
-  data: Array<Story>;
+export interface StoryState {
+  data: SetPayload;
   isLoading: boolean;
   isError: boolean;
 }
@@ -69,7 +76,13 @@ export const storiesReducer: StoryReducer = (
         ...state,
         isLoading: false,
         isError: false,
-        data: action.payload,
+        data: {
+          list:
+            action.payload.page === 0
+              ? action.payload.list
+              : state.data.list.concat(action.payload.list),
+          page: action.payload.page,
+        },
       };
     case Action.STORIES_FETCH_FAILURE:
       return {
@@ -82,9 +95,12 @@ export const storiesReducer: StoryReducer = (
     case Action.REMOVE_STORY:
       return {
         ...state,
-        data: state.data.filter(
-          (story) => story.objectID !== action.payload.objectID
-        ),
+        data: {
+          list: state.data.list.filter(
+            (story) => story.objectID !== action.payload.objectID
+          ),
+          page: state.data.page,
+        },
       };
     default:
       throw new Error();
