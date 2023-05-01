@@ -3,7 +3,7 @@ import "./App.css";
 import axios from "axios";
 import { useStorageState } from "./hooks";
 import { List, SearchForm, SortCards } from "./components";
-import { Action, Story, storiesReducer } from "./storiesReducer";
+import { Action, storiesReducer } from "./storiesReducer";
 import { getUrl, extractSearchTerm } from "./utils";
 
 const App: React.FC<{}> = () => {
