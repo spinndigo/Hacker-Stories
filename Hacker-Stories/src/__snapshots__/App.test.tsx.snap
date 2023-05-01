@@ -6,7 +6,9 @@ exports[`SearchForm > renders snapshot 1`] = `
     for="search"
   >
     <strong>
+       
       Search Term
+       
     </strong>
     : 
   </label>
