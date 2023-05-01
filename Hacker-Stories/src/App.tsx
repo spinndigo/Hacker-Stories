@@ -4,19 +4,8 @@ import axios from "axios";
 import { useStorageState } from "./hooks";
 import { List, SearchForm, SortCards } from "./components";
 import { Action, Story, storiesReducer } from "./storiesReducer";
+import { getUrl, extractSearchTerm } from "./utils";
 
-const API_BASE = "https://hn.algolia.com/api/v1";
-const API_SEARCH = "/search";
-const PARAM_SEARCH = "query=";
-const PARAM_PAGE = "page=";
-
-const getUrl = (searchTerm: string, page: number) =>
-  `${API_BASE}${API_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`;
-
-const extractSearchTerm = (url: string) =>
-  url
-    .substring(url.lastIndexOf("?") + 1, url.lastIndexOf("&"))
-    .replace(PARAM_SEARCH, "");
 const App: React.FC<{}> = () => {
   const { searchTerm, setSearchTerm } = useStorageState("search", "React");
   const [stories, dispatchStories] = useReducer(storiesReducer, {
