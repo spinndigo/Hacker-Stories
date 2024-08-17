@@ -1,8 +1,8 @@
-const searchInput = "search-input";
-const searchSubmit = "search-submit";
-const hits = "hits-list";
-const listHit = (id: string) => `hit-${id}`;
-const removelistItem = (id: string) => `remove-${id}`;
+const searchInput = "[data-testid='search-input']";
+const searchSubmit = "[data-testid='search-submit']";
+const hits = "[data-testid='hits-list']";
+const listHit = (id: string) => `[data-testid='hit-${id}']`;
+const removelistItem = (id: string) => `[data-testid='remove-${id}']`;
 
 describe("App Functions", () => {
   beforeEach(() => {
@@ -10,13 +10,15 @@ describe("App Functions", () => {
   });
 
   it("search for Graphql and get results", () => {
+    cy.get(searchInput).clear();
     cy.get(searchInput).type("graphql");
     cy.get(searchSubmit).click();
     cy.get(listHit("0")).should("exist");
   });
 
   it("returns no results for bad search", () => {
-    cy.get(searchInput).type("blah blah blah");
+    cy.get(searchInput).clear();
+    cy.get(searchInput).type("blah");
     cy.get(searchSubmit).click();
     cy.get(listHit("0")).should("not.exist");
   });
