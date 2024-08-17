@@ -2,6 +2,7 @@ import { PropsWithChildren, useRef, useEffect } from "react";
 
 type InputEvent = React.ChangeEvent<HTMLInputElement>;
 interface InputWithLabelProps {
+  testId: string;
   onInputChange(event: InputEvent): void;
   value: string;
   id: string;
@@ -12,6 +13,7 @@ interface InputWithLabelProps {
 export const InputWithLabel: React.FC<
   PropsWithChildren<InputWithLabelProps>
 > = ({
+  testId,
   onInputChange,
   value,
   id,
@@ -35,6 +37,7 @@ export const InputWithLabel: React.FC<
     <>
       <label htmlFor={id}>{children}: </label>
       <input
+        data-testid={testId}
         ref={inputRef}
         value={value}
         id={id}
@@ -43,8 +46,7 @@ export const InputWithLabel: React.FC<
       />
 
       <p>
-        {" "}
-        Searching for <strong>{value}</strong>{" "}
+        Searching for <strong>{value}</strong>
       </p>
     </>
   );

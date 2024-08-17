@@ -15,13 +15,14 @@ export const SearchForm: React.FC<Props> = ({
     <form onSubmit={handleSearchSubmit}>
       <InputWithLabel
         isFocused
+        testId="search-input"
         value={searchTerm}
         onInputChange={handleSearchInput}
         id={"search"}
       >
         <strong> {"Search Term"} </strong>
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <button data-testid="search-submit" type="submit" disabled={!searchTerm}>
         Submit
       </button>
     </form>
